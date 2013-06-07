@@ -17,10 +17,12 @@ import com.example.callanalyzer.R;
 import com.example.callanalyzer.MainActivity.Read;
 import com.example.callanalyzer.MainActivity.MyPhoneStateListener;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.telephony.PhoneStateListener;
@@ -46,48 +48,30 @@ public class MainActivity extends Activity {
 		new Read().execute("keywords");
 		 TelephonyManager telManager = (TelephonyManager)
 					getSystemService(Context.TELEPHONY_SERVICE);
-					  String opName = telManager.getNetworkOperatorName();
-					  Log.i("telephony", "operator name = " + opName);
-					  String phoneNumber = telManager.getLine1Number();
-					  Log.i("telephony", "phone number = " + phoneNumber);
-					  String providerName = telManager.getSimOperatorName();
-					  Log.i("telephony", "provider name = " + providerName);
-					  /*String[] strFields = {
-						        android.provider.CallLog.Calls.NUMBER, 
-						        android.provider.CallLog.Calls.TYPE,
-						        android.provider.CallLog.Calls.CACHED_NAME,
-						        android.provider.CallLog.Calls.CACHED_NUMBER_TYPE,
-						        android.provider.CallLog.Calls.DURATION
-						        };
-						String strOrder = android.provider.CallLog.Calls.DATE + " DESC"; 
-						 
-						Cursor mCallCursor = getContentResolver().query(
-						        android.provider.CallLog.Calls.CONTENT_URI,
-						        strFields,
-						        null,
-						        null,
-						        strOrder
-						        );
-						// get start of cursor
-						if(mCallCursor.moveToFirst()){
-						 
-							long total = 0;
-						  // loop through cursor 
-						  do{
-							  int type=(int) mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE));
-							  long durationMillis = mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.DURATION));
-							  if(type==2) total+=durationMillis;
-							  Log.i("telephony", "durationismillis= " + durationMillis);
-							  Log.i("telephony", "type= " + mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE)));
-						 
-						  } while (mCallCursor.moveToNext());
-						 
-						  Log.i("duration","Total Outgoing=" + total );
-						}*/
-						
+		 
+		 					//to get Provider name and Phone number of user 
+					  		String opName = telManager.getNetworkOperatorName();
+					  		Log.i("telephony", "operator name = " + opName);
+					  		String phoneNumber = telManager.getLine1Number();
+					  		Log.i("telephony", "phone number = " + phoneNumber);
+					  		String providerName = telManager.getSimOperatorName();
+					  		Log.i("telephony", "provider name = " + providerName);
+					  
+							//Phone state listner
 						    MyPhoneStateListener phoneListener=new MyPhoneStateListener(); 
 						    getSystemService(Context.TELEPHONY_SERVICE);
 						    telManager.listen(phoneListener,PhoneStateListener.LISTEN_CALL_STATE);
+						    
+						    //counter for sent messages
+						    Uri mSmsinboxQueryUri = Uri.parse("content://sms/sent");
+						    Cursor cursor1 = getContentResolver().query(mSmsinboxQueryUri,
+						    new String[] { "_id", "thread_id", "address", "person", "date",
+						                                "body", "type" }, null, null, null);
+						    String[] columns = new String[] { "address", "person", "date", "body","type" };
+						    if (cursor1.getCount() > 0) {
+						        String count = Integer.toString(cursor1.getCount());
+						        Log.i("Count",count);
+						    }
     }
 
     public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{
@@ -138,7 +122,7 @@ public class MainActivity extends Activity {
 					  int type=(int) mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE));
 					  long durationMillis = mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.DURATION));
 					  if(type==2) total+=durationMillis;
-					  Log.i("DEBUG", "durationismillis= " + durationMillis);
+					  Log.i("DEBUG", "durationinmillis= " + durationMillis);
 					  Log.i("DEBUG", "type= " + mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE)));
 				 
 				  } while (mCallCursor.moveToNext());
