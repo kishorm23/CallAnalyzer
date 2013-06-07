@@ -15,10 +15,17 @@ import org.json.JSONObject;
 
 import com.example.callanalyzer.R;
 import com.example.callanalyzer.MainActivity.Read;
+import com.example.callanalyzer.MainActivity.MyPhoneStateListener;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.CallLog;
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
@@ -37,9 +44,53 @@ public class MainActivity extends Activity {
 		httpStuff = (TextView) findViewById(R.id.tvHttp);
 		client = new DefaultHttpClient();
 		new Read().execute("keywords");
+		 TelephonyManager telManager = (TelephonyManager)
+					getSystemService(Context.TELEPHONY_SERVICE);
+					  String opName = telManager.getNetworkOperatorName();
+					  Log.i("telephony", "operator name = " + opName);
+					  String phoneNumber = telManager.getLine1Number();
+					  Log.i("telephony", "phone number = " + phoneNumber);
+					  String providerName = telManager.getSimOperatorName();
+					  Log.i("telephony", "provider name = " + providerName);
+					  /*String[] strFields = {
+						        android.provider.CallLog.Calls.NUMBER, 
+						        android.provider.CallLog.Calls.TYPE,
+						        android.provider.CallLog.Calls.CACHED_NAME,
+						        android.provider.CallLog.Calls.CACHED_NUMBER_TYPE,
+						        android.provider.CallLog.Calls.DURATION
+						        };
+						String strOrder = android.provider.CallLog.Calls.DATE + " DESC"; 
+						 
+						Cursor mCallCursor = getContentResolver().query(
+						        android.provider.CallLog.Calls.CONTENT_URI,
+						        strFields,
+						        null,
+						        null,
+						        strOrder
+						        );
+						// get start of cursor
+						if(mCallCursor.moveToFirst()){
+						 
+							long total = 0;
+						  // loop through cursor 
+						  do{
+							  int type=(int) mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE));
+							  long durationMillis = mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.DURATION));
+							  if(type==2) total+=durationMillis;
+							  Log.i("telephony", "durationismillis= " + durationMillis);
+							  Log.i("telephony", "type= " + mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE)));
+						 
+						  } while (mCallCursor.moveToNext());
+						 
+						  Log.i("duration","Total Outgoing=" + total );
+						}*/
+						
+						    MyPhoneStateListener phoneListener=new MyPhoneStateListener(); 
+						    getSystemService(Context.TELEPHONY_SERVICE);
+						    telManager.listen(phoneListener,PhoneStateListener.LISTEN_CALL_STATE);
     }
 
-    public JSONObject lastTweet(String string) throws ClientProtocolException, IOException, JSONException{
+    public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{
 		StringBuilder url=new StringBuilder(URL);
 		//url.append(string);
 		
@@ -59,13 +110,52 @@ public class MainActivity extends Activity {
 		}
 	}
 
+    public class MyPhoneStateListener extends PhoneStateListener {
+		  public void onCallStateChanged(int state,String incomingNumber){
+		  if(state==TelephonyManager.CALL_STATE_IDLE){
+			  String[] strFields = {
+				        android.provider.CallLog.Calls.NUMBER, 
+				        android.provider.CallLog.Calls.TYPE,
+				        android.provider.CallLog.Calls.CACHED_NAME,
+				        android.provider.CallLog.Calls.CACHED_NUMBER_TYPE,
+				        android.provider.CallLog.Calls.DURATION
+				        };
+				String strOrder = android.provider.CallLog.Calls.DATE + " DESC"; 
+				 
+				Cursor mCallCursor = getContentResolver().query(
+				        android.provider.CallLog.Calls.CONTENT_URI,
+				        strFields,
+				        null,
+				        null,
+				        strOrder
+				        );
+				// get start of cursor
+				if(mCallCursor.moveToFirst()){
+				 
+					long total = 0;
+				  // loop through cursor 
+				  do{
+					  int type=(int) mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE));
+					  long durationMillis = mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.DURATION));
+					  if(type==2) total+=durationMillis;
+					  Log.i("DEBUG", "durationismillis= " + durationMillis);
+					  Log.i("DEBUG", "type= " + mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE)));
+				 
+				  } while (mCallCursor.moveToNext());
+				 
+				  Log.i("DEBUG","Total Outgoing=" + total );
+				}
+		    }
+		  } 
+		}
+    
 	public class Read extends AsyncTask<String, Integer, String>
 	{
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			try {
-				json=lastTweet("ab");
+				json=lastPack();
 				return json.getString(params[0]);
 				
 			} catch (ClientProtocolException e) {
