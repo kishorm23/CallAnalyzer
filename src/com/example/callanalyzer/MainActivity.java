@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
 				  do{
 					  int type=(int) mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE));
 					  long durationMillis = mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.DURATION));
-					  if(type==2) total+=durationMillis;
+					  if(type==2) total+=durationMillis; //type 2 are outgoing calls
 					  Log.i("DEBUG", "durationinmillis= " + durationMillis);
 					  Log.i("DEBUG", "type= " + mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE)));
 				 
