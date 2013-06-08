@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
 	HttpClient client;
 	JSONObject json;
 	final static String URL="http://app.ireff.in:9090/IreffWeb/android?service=idea&circle=mp";
-	
+	int i=0;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
 						                                "body", "type" }, null, null, null);
 						    String[] columns = new String[] { "address", "person", "date", "body","type" };
 						    if (cursor1.getCount() > 0) {
-						        String count = Integer.toString(cursor1.getCount());
+						        String count = Integer.toString(cursor1.getCount()); //number of sent messages
 						        Log.i("Count",count);
 						    }
     }
@@ -96,7 +96,13 @@ public class MainActivity extends Activity {
 
     public class MyPhoneStateListener extends PhoneStateListener {
 		  public void onCallStateChanged(int state,String incomingNumber){
-		  if(state==TelephonyManager.CALL_STATE_IDLE){
+			  if(state==TelephonyManager.CALL_STATE_IDLE&&i!=0){
+				  try {
+					Thread.sleep(500); //wait till last call is logged in call log
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			  String[] strFields = {
 				        android.provider.CallLog.Calls.NUMBER, 
 				        android.provider.CallLog.Calls.TYPE,
@@ -130,6 +136,7 @@ public class MainActivity extends Activity {
 				  Log.i("DEBUG","Total Outgoing=" + total );
 				}
 		    }
+			  if(i==0) i++; //prevents executing phone state listener when activity starts for first time
 		  } 
 		}
     
