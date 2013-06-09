@@ -17,11 +17,13 @@ import com.example.callanalyzer.R;
 import com.example.callanalyzer.MainActivity.Read;
 import com.example.callanalyzer.MainActivity.MyPhoneStateListener;
 
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -72,6 +74,19 @@ public class MainActivity extends Activity {
 						        String count = Integer.toString(cursor1.getCount()); //number of sent messages
 						        Log.i("Count",count);
 						    }
+						    
+						    //counts network data transfer
+						    long mStartRX = TrafficStats.getMobileRxBytes(); //Bytes received over mobile interface
+						    long mStartTX = TrafficStats.getMobileTxBytes(); //Bytes sent over mobile interface
+						    if (mStartRX ==TrafficStats.UNSUPPORTED || mStartTX ==TrafficStats.UNSUPPORTED) {
+						    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+						    Log.i("DEBUG","UNSUPPORTED: " + TrafficStats.UNSUPPORTED);
+						    }
+						    else {
+						    	Log.i("DEBUG","Total bytes sent: " + mStartTX);
+						    	Log.i("DEBUG","Total bytes received: " + mStartRX);
+						    	Log.i("DEBUG","Total data transfer: " + (mStartTX+mStartRX));
+						    	}
     }
 
     public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{
