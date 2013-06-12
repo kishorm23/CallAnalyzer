@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
 	TextView httpStuff;
 	HttpClient client;
 	JSONObject json;
+	DatabaseHandler db = new DatabaseHandler(this);
 	final static String URL="http://app.ireff.in:9090/IreffWeb/android?service=idea&circle=mp";
 	int i=0;
 	
@@ -87,6 +88,13 @@ public class MainActivity extends Activity {
 						    	Log.i("DEBUG","Total bytes received: " + mStartRX);
 						    	Log.i("DEBUG","Total data transfer: " + (mStartTX+mStartRX));
 						    	}
+						    
+					        /**
+					         * CRUD Operations
+					         * */
+					        if(db.getNumberOfRows()==0) db.addDuration(0); //if database is empty add one row
+					        int initialDuration=db.getDuration(1);
+					        Log.i("DEBUG","Initial duration: "+initialDuration);
     }
 
     public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{
@@ -136,19 +144,26 @@ public class MainActivity extends Activity {
 				        );
 				// get start of cursor
 				if(mCallCursor.moveToFirst()){
-				 
-					long total = 0;
-				  // loop through cursor 
-				  do{
+					 
+					long last = 0;
 					  int type=(int) mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE));
 					  long durationMillis = mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.DURATION));
-					  if(type==2) total+=durationMillis; //type 2 are outgoing calls
-					  Log.i("DEBUG", "durationinmillis= " + durationMillis);
+					  if(type==2){ last=durationMillis;
+					  Log.i("DEBUG", "durationismillis= " + durationMillis);
 					  Log.i("DEBUG", "type= " + mCallCursor.getLong(mCallCursor.getColumnIndex(CallLog.Calls.TYPE)));
+					  Log.i("DEBUG", "number= " + mCallCursor.getString(mCallCursor.getColumnIndex(CallLog.Calls.NUMBER)));
+					  }
 				 
-				  } while (mCallCursor.moveToNext());
-				 
-				  Log.i("DEBUG","Total Outgoing=" + total );
+				  Log.i("DEBUG","Total Outgoing=" + last );
+				  
+				  TextView a;
+		    		int total=db.getDuration(1);
+		    		Log.i("DEBUG","DB DURATION_ini: "+total);
+		    		total=total+(int)last;
+		    		int updateDuration = db.updateDuration(total);
+		    		Log.i("DEBUG","DB DURATION_fin: "+total);
+		    		a=(TextView) findViewById(R.id.tvHttp);
+		    		a.setText("Duration in seconds: "+total);
 				}
 		    }
 			  if(i==0) i++; //prevents executing phone state listener when activity starts for first time
