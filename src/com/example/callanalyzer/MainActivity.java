@@ -92,9 +92,19 @@ public class MainActivity extends Activity {
 					        /**
 					         * CRUD Operations
 					         * */
-					        if(db.getNumberOfRows()==0) db.addDuration(0); //if database is empty add one row
-					        int initialDuration=db.getDuration(1);
+						    if(db.getNumberOfRows()==0) db.intializeDB(); //initialize if database is empty
+					        long initialDuration= db.getDuration(1);
+					        long initialRxBytes = db.getRxBytes(1);
+					        long initialTxBytes = db.getTxBytes(1);
 					        Log.i("DEBUG","Initial duration: "+initialDuration);
+					        Log.i("DEBUG","Initial Recieved bytes: "+initialRxBytes);
+					        Log.i("DEBUG","Initial transferred bytes: "+initialTxBytes);
+					        
+					        db.updateRxBytes(initialRxBytes+mStartRX);
+					        db.updateTxBytes(initialTxBytes+mStartTX);
+					        
+					        Log.i("DEBUG","Final Recieved bytes: "+db.getRxBytes(1));
+					        Log.i("DEBUG","Final transferred bytes: "+db.getTxBytes(1));
     }
 
     public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{
