@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import com.example.callanalyzer.R;
 import com.example.callanalyzer.MainActivity.Read;
 import com.example.callanalyzer.MainActivity.MyPhoneStateListener;
+import com.example.callanalyzer.ShutDownReceiver;
 
 import android.net.TrafficStats;
 import android.net.Uri;
@@ -24,8 +25,11 @@ import android.os.Bundle;
 import android.provider.CallLog;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -76,35 +80,19 @@ public class MainActivity extends Activity {
 						        Log.i("Count",count);
 						    }
 						    
-						    //counts network data transfer
-						    long mStartRX = TrafficStats.getMobileRxBytes(); //Bytes received over mobile interface
-						    long mStartTX = TrafficStats.getMobileTxBytes(); //Bytes sent over mobile interface
-						    if (mStartRX ==TrafficStats.UNSUPPORTED || mStartTX ==TrafficStats.UNSUPPORTED) {
-						    AlertDialog.Builder alert = new AlertDialog.Builder(this);
-						    Log.i("DEBUG","UNSUPPORTED: " + TrafficStats.UNSUPPORTED);
-						    }
-						    else {
-						    	Log.i("DEBUG","Total bytes sent: " + mStartTX);
-						    	Log.i("DEBUG","Total bytes received: " + mStartRX);
-						    	Log.i("DEBUG","Total data transfer: " + (mStartTX+mStartRX));
-						    	}
+
+					        if(db.getNumberOfRows()==0) db.intializeDB(); //if database is empty
 						    
+						    IntentFilter filter = new IntentFilter(Intent.ACTION_SHUTDOWN);
+						    BroadcastReceiver mReceiver = new ShutDownReceiver();
+						    registerReceiver(mReceiver, filter);
+					        
 					        /**
 					         * CRUD Operations
 					         * */
-						    if(db.getNumberOfRows()==0) db.intializeDB(); //initialize if database is empty
 					        long initialDuration= db.getDuration(1);
-					        long initialRxBytes = db.getRxBytes(1);
-					        long initialTxBytes = db.getTxBytes(1);
 					        Log.i("DEBUG","Initial duration: "+initialDuration);
-					        Log.i("DEBUG","Initial Recieved bytes: "+initialRxBytes);
-					        Log.i("DEBUG","Initial transferred bytes: "+initialTxBytes);
-					        
-					        db.updateRxBytes(initialRxBytes+mStartRX);
-					        db.updateTxBytes(initialTxBytes+mStartTX);
-					        
-					        Log.i("DEBUG","Final Recieved bytes: "+db.getRxBytes(1));
-					        Log.i("DEBUG","Final transferred bytes: "+db.getTxBytes(1));
+
     }
 
     public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{

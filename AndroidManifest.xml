@@ -25,6 +25,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+                <receiver android:name=".ShutdownReceiver">
+ 			 <intent-filter>
+    			<action android:name="android.intent.action.ACTION_SHUTDOWN" />
+  			 </intent-filter>
+		</receiver>
+		        <receiver android:name=".ShutdownReceiver">
+ 			 <intent-filter>
+    			<action android:name="android.intent.action.QUICKBOOT_POWEROFF" />
+  			 </intent-filter>
+		</receiver>
     </application>
 
 </manifest>
