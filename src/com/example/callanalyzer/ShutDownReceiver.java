@@ -1,7 +1,5 @@
 package com.example.callanalyzer;
 
-import android.app.AlertDialog;
-import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +17,6 @@ public class ShutDownReceiver extends BroadcastReceiver {
         	    long mStartRX = TrafficStats.getMobileRxBytes(); //Bytes received over mobile interface since last boot
 			    long mStartTX = TrafficStats.getMobileTxBytes(); //Bytes sent over mobile interface since last boot
 			    if (mStartRX ==TrafficStats.UNSUPPORTED || mStartTX ==TrafficStats.UNSUPPORTED) {
-			    AlertDialog.Builder alert = new AlertDialog.Builder(context);
 			    Log.i("DEBUG","UNSUPPORTED: " + TrafficStats.UNSUPPORTED);
 			    }
 			    else {

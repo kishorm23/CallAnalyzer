@@ -17,7 +17,6 @@ import com.example.callanalyzer.R;
 import com.example.callanalyzer.MainActivity.Read;
 import com.example.callanalyzer.MainActivity.MyPhoneStateListener;
 import com.example.callanalyzer.ShutDownReceiver;
-
 import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -40,10 +39,8 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
 	TextView httpStuff;
-	HttpClient client;
 	JSONObject json;
 	DatabaseHandler db = new DatabaseHandler(this);
-	final static String URL="http://app.ireff.in:9090/IreffWeb/android?service=idea&circle=mp";
 	int i=0;
 	
     @Override
@@ -51,7 +48,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		httpStuff = (TextView) findViewById(R.id.tvHttp);
-		client = new DefaultHttpClient();
 		new Read().execute("keywords");
 		 TelephonyManager telManager = (TelephonyManager)
 					getSystemService(Context.TELEPHONY_SERVICE);
@@ -64,7 +60,7 @@ public class MainActivity extends Activity {
 					  		String providerName = telManager.getSimOperatorName();
 					  		Log.i("telephony", "provider name = " + providerName);
 					  
-							//Phone state listner
+							//Phone state listener
 						    MyPhoneStateListener phoneListener=new MyPhoneStateListener(); 
 						    getSystemService(Context.TELEPHONY_SERVICE);
 						    telManager.listen(phoneListener,PhoneStateListener.LISTEN_CALL_STATE);
@@ -92,28 +88,10 @@ public class MainActivity extends Activity {
 					         * */
 					        long initialDuration= db.getDuration(1);
 					        Log.i("DEBUG","Initial duration: "+initialDuration);
+new Read().execute("detail");
 
     }
 
-    public JSONObject lastPack() throws ClientProtocolException, IOException, JSONException{
-		StringBuilder url=new StringBuilder(URL);
-		//url.append(string);
-		
-		HttpGet get=new HttpGet(url.toString());
-		HttpResponse r=client.execute(get);
-		int status=r.getStatusLine().getStatusCode();
-		if(status==200){
-			HttpEntity e=r.getEntity();
-			String data=EntityUtils.toString(e);
-			JSONArray timeline=new JSONArray(data);
-			JSONObject last=timeline.getJSONObject(1);
-			return last;
-		}
-		else{
-			//Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG);
-			return null;
-		}
-	}
 
     public class MyPhoneStateListener extends PhoneStateListener {
 		  public void onCallStateChanged(int state,String incomingNumber){
@@ -168,36 +146,64 @@ public class MainActivity extends Activity {
 		  } 
 		}
     
-	public class Read extends AsyncTask<String, Integer, String>
+	public class Read extends AsyncTask<String, Integer, JSONArray>
 	{
 		@Override
-		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
+		protected JSONArray doInBackground(String... params) {
+
 			try {
-				json=lastPack();
-				return json.getString(params[0]);
+				JSONArray json;
+				json=JSONParser.getRechargePacks("airtel","mh");
+				return json;
+				
+			} catch (JSONException e) {
+				
+				e.printStackTrace();
 				
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
+			
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			return null;
 		}
 
-		@Override
-		protected void onPostExecute(String result) {
-			// TODO Auto-generated method stub
-			httpStuff.setText(result);
+		protected void onPostExecute(JSONArray result) {
 			
+			Log.i("DEBUG",""+result.length());
+			try {
+				int e=0;
+				while(e<result.length())
+				{
+				JSONObject pack=result.getJSONObject(e);
+				String params[]=new String[5];
+				double price=0;
+				double talktime=0;
+				if(!pack.isNull("category")) params[0]=pack.get("category").toString();
+				if(!pack.isNull("detail")) params[1]=pack.get("detail").toString();
+				if(!pack.isNull("price")) price=pack.getDouble("price");
+				if(!pack.isNull("keywords")) params[2]=pack.get("keywords").toString();
+				if(!pack.isNull("updated")) params[3]=pack.get("updated").toString();
+				if(!pack.isNull("validity")) params[4]=pack.get("category").toString();
+				if(!pack.isNull("talktime")) talktime=pack.getDouble("talktime");
+				
+				
+				Log.i("JSON",e+") "+params[0]+" "+talktime+" "+params[1]+" "+params[2]+" "+params[3]+" "+params[4]+" "+talktime);
+				db.insertRechargePack(params, price, talktime);
+				e++;
+				}
+			} catch (JSONException e) {
+				
+				e.printStackTrace();
+				
+			}
 		}
 		
-	}
+	}    
+
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
