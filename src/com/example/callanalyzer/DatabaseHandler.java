@@ -170,4 +170,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.close();
 		
 	}
+	
+	Cursor getRPackDatabase(int id)
+	{
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		Cursor cursor = db.query(TABLE_RECHARGE, new String[] { KEY_ID,
+				KEY_CATEGORY,KEY_DETAIL,KEY_PRICE,KEY_KEYWORDS,KEY_UPDATED,KEY_VALIDITY,KEY_TALKTIME}, KEY_ID + "=?",
+				new String[] { String.valueOf(id) }, null, null, null, null);
+		return cursor;
+	}
 }
