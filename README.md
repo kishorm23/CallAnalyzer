@@ -7,5 +7,7 @@ of outgoing call duration, outgoing messages, total data transfer over mobile in
 and suggests proper recharge pack to user.
 
 Permissions required:
+--------------------------
 *Read call duration and message counter.
+
 *Uses data based on carrier.
