@@ -7,6 +7,7 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
+<<<<<<< HEAD
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -14,6 +15,12 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+=======
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.READ_CALL_LOG" />
+	<uses-permission android:name="android.permission.READ_SMS"/>
+>>>>>>> e45345c48ebf2d23d2d1a7e1e71dad24b9f7ef49
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -28,6 +35,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<<<<<<< HEAD
+=======
+                <receiver android:name=".ShutdownReceiver">
+ 			 <intent-filter>
+    			<action android:name="android.intent.action.ACTION_SHUTDOWN" />
+  			 </intent-filter>
+		</receiver>
+		        <receiver android:name=".ShutdownReceiver">
+ 			 <intent-filter>
+    			<action android:name="android.intent.action.QUICKBOOT_POWEROFF" />
+  			 </intent-filter>
+		</receiver>
+    </application>
+>>>>>>> e45345c48ebf2d23d2d1a7e1e71dad24b9f7ef49
 
         <receiver android:name=".ShutdownReceiver" >
             <intent-filter>
