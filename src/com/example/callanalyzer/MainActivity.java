@@ -84,7 +84,7 @@ new Read().execute("detail");
 		  public void onCallStateChanged(int state,String incomingNumber){
 			  if(state==TelephonyManager.CALL_STATE_IDLE&&i!=0){
 				  try {
-					Thread.sleep(500); //wait till last call is logged in call log
+					Thread.sleep(2000); //wait till last call is logged in call log
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
